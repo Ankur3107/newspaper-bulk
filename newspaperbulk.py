@@ -131,7 +131,9 @@ def get_text_from_url(url, session, cleanwriter, errorwriter, allow_redirects=Fa
                     article.text,
                     article.title,
                     article.keywords,
-                    url_str
+                    url_str,
+                    article.tags,
+                    article.meta_keywords
                 ])
             
         else:   
@@ -206,7 +208,7 @@ def main():
         cleanwriter = csv.writer(cleanfile, dialect='excel')
         errorwriter = csv.writer(errorfile, dialect='excel')
         
-        cleanwriter.writerow(['text', 'title', 'keywords', 'url'])
+        cleanwriter.writerow(['text', 'title', 'keywords', 'url', 'tags', 'meta_tags'])
         errorwriter.writerow(['url', 'error'])
 
         q = Queue(maxsize=0)
