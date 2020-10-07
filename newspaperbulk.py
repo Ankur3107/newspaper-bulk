@@ -15,6 +15,10 @@ from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 from requests.exceptions import ConnectionError, InvalidSchema, MissingSchema, TooManyRedirects, RetryError
 
+## for date parsing
+from bs4 import BeautifulSoup
+from dateutil.parser import parse
+
 
 def parse_input_file(filepath):
     """
@@ -91,6 +95,12 @@ def create_session(max_retries=0, backoff_factor=0):
     
     return session
 
+def get_date_time(html):
+    soup = BeautifulSoup(article.html)
+    time_tag = soup.find('time')
+    time_tag = time_tag.getText()[14:-4]
+    dt = parse(time_tag)
+    return str(dt.date()), str(dt.time())
 
 def get_text_from_url(url, session, cleanwriter, errorwriter, allow_redirects=False, verify=True):
 
@@ -126,14 +136,16 @@ def get_text_from_url(url, session, cleanwriter, errorwriter, allow_redirects=Fa
             if article.download_state == 2:
                 article.parse()
                 article.nlp()
-                
+                date, time = get_date_time(article.html)
                 cleanwriter.writerow([
                     article.text,
                     article.title,
                     article.keywords,
                     url_str,
                     article.tags,
-                    article.meta_keywords
+                    article.meta_keywords,
+                    date,
+                    time
                 ])
             
         else:   
@@ -208,7 +220,7 @@ def main():
         cleanwriter = csv.writer(cleanfile, dialect='excel')
         errorwriter = csv.writer(errorfile, dialect='excel')
         
-        cleanwriter.writerow(['text', 'title', 'keywords', 'url', 'tags', 'meta_tags'])
+        cleanwriter.writerow(['text', 'title', 'keywords', 'url', 'tags', 'meta_tags', 'date', 'time'])
         errorwriter.writerow(['url', 'error'])
 
         q = Queue(maxsize=0)
