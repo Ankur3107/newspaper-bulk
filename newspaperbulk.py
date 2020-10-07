@@ -96,7 +96,7 @@ def create_session(max_retries=0, backoff_factor=0):
     return session
 
 def get_date_time(html):
-    soup = BeautifulSoup(article.html)
+    soup = BeautifulSoup(html)
     time_tag = soup.find('time')
     time_tag = time_tag.getText()[14:-4]
     dt = parse(time_tag)
